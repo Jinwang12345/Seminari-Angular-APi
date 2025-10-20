@@ -3,7 +3,11 @@ import {
   createEvento,
   getAllEventos,
   getEventoById,
-  deleteEventoById
+  deleteEventoById,
+  updateEvento,
+  addParticipante,
+  updateParticipante,
+  deleteParticipante,
 } from '../controller/eventoController';
 
 const router = Router();
@@ -96,6 +100,8 @@ router.post('/', createEvento);
  */
 router.get('/:id', getEventoById);
 
+router.patch('/:id', updateEvento);
+
 /**
  * @swagger
  * /api/event/{id}:
@@ -116,5 +122,10 @@ router.get('/:id', getEventoById);
  *         description: Evento no encontrado
  */
 router.delete('/:id', deleteEventoById);
+
+//Participantes routes
+router.post('/:id/participantes', addParticipante);
+router.patch('/:id/participantes/:idParticipante', updateParticipante);
+router.delete('/:id/participantes/:idParticipante', deleteParticipante);
 
 export default router;

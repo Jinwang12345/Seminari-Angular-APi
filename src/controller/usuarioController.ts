@@ -50,6 +50,53 @@ export async function getUserByUsername(req: Request, res: Response): Promise<Re
     return res.status(400).json({ message: (error as Error).message });
   }
 }
+// Agregar esta función a tu userController.ts
+export async function registerUser(req: Request, res: Response): Promise<Response> {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    const { username, gmail, password, birthday } = req.body;
+
+    // Validaciones básicas
+    if (!username || !gmail || !password) {
+      return res.status(400).json({ 
+        message: 'Todos los campos son obligatorios' 
+      });
+    }
+
+    // Verificar si el nombre de usuario ya existe
+    const existingUser = await userService.getUserByUsername(username);
+    if (existingUser) {
+      return res.status(400).json({ 
+        message: 'El nombre de usuario ya está en uso' 
+      });
+    }
+
+    // Crear nuevo usuario
+    const newUser: Partial<IUsuario> = {
+      username,
+      gmail,
+      password,
+      birthday: birthday ? new Date(birthday) : new Date(),
+      eventos: []
+    };
+
+    const user = await userService.createUser(newUser);
+
+    return res.status(201).json({
+      message: 'Usuario registrado exitosamente',
+      user: removePassword(user)
+    });
+  } catch (error) {
+    console.error('Error en registro:', error);
+    return res.status(500).json({ 
+      error: 'Error al registrar usuario' 
+    });
+  }
+}
 
 export async function updateUserById(req: Request, res: Response): Promise<Response> {
   try {

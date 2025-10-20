@@ -10,7 +10,8 @@ import {
   deleteUserByUsername,
   addEventToUser,
   loginUser,           
-  createAdminUser      
+  createAdminUser,      
+  registerUser
 } from '../controller/usuarioController';
 
 const router = Router();
@@ -299,5 +300,7 @@ router.post('/auth/login', loginUser);
  *         description: Usuario admin creado/verificado
  */
 router.post('/auth/create-admin', createAdminUser);
+router.post('/auth/register', registerUser);
+
 
 export default router;

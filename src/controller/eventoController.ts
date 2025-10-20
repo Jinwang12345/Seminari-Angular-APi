@@ -66,6 +66,27 @@ export async function getEventoById(req: Request, res: Response): Promise<Respon
   }
 }
 
+export async function updateEvento(req: Request, res: Response): Promise<Response> {
+  try {
+    const { id } = req.params;
+    const { name, schedule, address } = req.body;
+
+    const updated = await eventoService.updateEvento(id, {
+      name,
+      schedule: normalizeSchedule(schedule),
+      address
+    });
+
+    if (!updated) {
+      return res.status(404).json({ message: 'EVENTO NO ENCONTRADO' });
+    }
+
+    return res.status(200).json(updated);
+  } catch (error) {
+    return res.status(400).json({ message: (error as Error).message });
+  }
+}
+
 export async function deleteEventoById(req: Request, res: Response): Promise<Response> {
   try {
     const { id } = req.params;
@@ -86,3 +107,47 @@ export async function deleteEventoById(req: Request, res: Response): Promise<Res
     return res.status(400).json({ message: (error as Error).message });
   }
 }
+
+export const addParticipante = async (req: Request, res: Response) => {
+  try {
+    const { usuario, role, nombreSnapshot, emailSnapshot } = req.body;
+    const evento = await eventoService.addParticipante(req.params.id, {
+      usuario,
+      role,
+      nombreSnapshot,
+      emailSnapshot,
+    });
+    if (!evento) return res.status(404).json({ message: 'Evento no encontrado' });
+    res.status(201).json(evento);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error al añadir participante' });
+  }
+};
+
+export const updateParticipante = async (req: Request, res: Response) => {
+  try {
+    const evento = await eventoService.updateParticipante(
+      req.params.id,
+      req.params.idParticipante,
+      req.body
+    );
+    if (!evento) return res.status(404).json({ message: 'Participante no encontrado' });
+    res.json(evento);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al actualizar participante' });
+  }
+};
+
+export const deleteParticipante = async (req: Request, res: Response) => {
+  try {
+    const evento = await eventoService.deleteParticipante(
+      req.params.id,
+      req.params.idParticipante
+    );
+    if (!evento) return res.status(404).json({ message: 'Evento no encontrado' });
+    res.json(evento);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al eliminar participante' });
+  }
+};
